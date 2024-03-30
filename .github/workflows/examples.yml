@@ -1,64 +1,77 @@
-name: Examples
+name: examples
 
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - '**.md'
+      - '**.rst'
+      - 'LICENSE'
+      - '.gitignore'
 
 jobs:
   build:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
         example:
-          - "examples/arduino-blink"
-          - "examples/arduino-external-libs"
-          - "examples/arduino-internal-libs"
-          - "examples/arduino-mbed-doom"
-          - "examples/arduino-mbed-rpc"
-          - "examples/arduino-mxchip-azureiot"
-          - "examples/arduino-mxchip-filesystem"
-          - "examples/arduino-mxchip-sensors"
-          - "examples/arduino-mxchip-wifiscan"
-          - "examples/cmsis-blink"
-          - "examples/libopencm3-1bitsy"
-          - "examples/libopencm3-blink"
-          - "examples/libopencm3-usb-cdcacm"
-          - "examples/mbed-rtos-blink-baremetal"
-          - "examples/mbed-rtos-custom-target"
-          - "examples/mbed-rtos-ethernet-tls"
-          - "examples/mbed-rtos-events"
-          - "examples/mbed-rtos-filesystem"
-          - "examples/mbed-rtos-mesh-minimal"
-          - "examples/mbed-rtos-serial"
-          - "examples/mbed-rtos-usb-keyboard"
-          - "examples/mbed-rtos-sockets"
-          - "examples/spl-blink"
-          - "examples/stm32cube-hal-blink"
-          - "examples/stm32cube-hal-eeprom-emulation"
-          - "examples/stm32cube-hal-extmem-boot"
-          - "examples/stm32cube-hal-iap"
-          - "examples/stm32cube-hal-lcd"
-          - "examples/stm32cube-hal-usb-device-dfu"
-          - "examples/stm32cube-hal-wifi-client"
-          - "examples/stm32cube-ll-blink"
-          - "examples/zephyr-blink"
-          - "examples/zephyr-cpp-synchronization"
-          - "examples/zephyr-drivers-can"
-          - "examples/zephyr-net-https-client"
-          - "examples/zephyr-subsys-usb-hid-mouse"
-          - "tests/arduino-blink-different-cores"
+          - "arduino-blink"
+          - "arduino-external-libs"
+          - "arduino-internal-libs"
+          - "arduino-mbed-doom"
+          - "arduino-mbed-rpc"
+          - "arduino-mxchip-azureiot"
+          - "arduino-mxchip-filesystem"
+          - "arduino-mxchip-sensors"
+          - "arduino-mxchip-wifiscan"
+          - "cmsis-blink"
+          - "libopencm3-1bitsy"
+          - "libopencm3-blink"
+          - "libopencm3-usb-cdcacm"
+          - "mbed-rtos-blink-baremetal"
+          - "mbed-rtos-custom-target"
+          - "mbed-rtos-ethernet-tls"
+          - "mbed-rtos-events"
+          - "mbed-rtos-filesystem"
+          - "mbed-rtos-mesh-minimal"
+          - "mbed-rtos-serial"
+          - "mbed-rtos-sockets"
+          - "mbed-rtos-usb-keyboard"
+          - "spl-blink"
+          - "stm32cube-hal-blink"
+          - "stm32cube-hal-eeprom-emulation"
+          - "stm32cube-hal-extmem-boot"
+          - "stm32cube-hal-iap"
+          - "stm32cube-hal-lcd"
+          - "stm32cube-hal-usb-device-dfu"
+          - "stm32cube-hal-wifi-client"
+          - "stm32cube-ll-blink"
+          - "zephyr-blink"
+          - "zephyr-cpp-synchronization"
+          - "zephyr-drivers-can"
+          - "zephyr-net-https-client"
+          - "zephyr-subsys-usb-hid-mouse"
+        os: [ubuntu-latest, windows-latest, macos-latest]
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
+          token: ${{ secrets.OSQ_REPO_TOKEN }}
           submodules: "recursive"
-      - name: Set up Python
-        uses: actions/setup-python@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
         with:
-          python-version: "3.9"
+            python-version: '3.11'
+            architecture: 'x64'
+
       - name: Install dependencies
         run: |
-          pip install -U https://github.com/platformio/platformio/archive/develop.zip
+          pip install -U https://github.com/os-q/pio/archive/develop.zip
           pio pkg install --global --platform symlink://.
+
       - name: Build examples
+        working-directory: examples
         run: |
           pio run -d ${{ matrix.example }}

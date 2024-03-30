@@ -34,7 +34,7 @@
     "disable_flushing": false,
     "maximum_ram_size": 65536,
     "maximum_size": 393216,
-    "protocol": "stlink",
+    "protocol": "jlink",
     "protocols": [
       "jlink",
       "cmsis-dap",
